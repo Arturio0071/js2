@@ -1,34 +1,110 @@
-const goods = [
-    { title: 'Shirt', price: 150, img: "img/noimg.jpg" },
-    { title: 'Socks', price: 50, img: "img/noimg.jpg" },
-    { title: 'Jacket', price: 350, img: "img/noimg.jpg" },
-    { title: 'Shoes', price: 250, img: "img/noimg.jpg" },
-];
+class Api {
+    constructor() {
+        this.url = '/goods.json';
+    }
+
+    fetch(error, success) {
+        let xhr;
+
+        if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    success(JSON.parse(xhr.responseText));
+                } else if (xhr.status > 400) {
+                    error('Ошибка');
+                }
+            }
+        }
+
+        xhr.open('GET', this.url, true);
+        xhr.send();
+    }
 
 
-const $goodsList = document.querySelector('.goods-list');
 
-const renderGoodsItem = ({ title, price, img }) => {
-    return `<div class="goods-item"><img src="${img}"><h3>${title}</h3><p>${price} $</p><button class="add_cart" type="button">В корзину</button></div>`;
-};
-
-const renderGoodsList = (list = goods) => {
-    let goodsList = list.map(
-        item => renderGoodsItem(item)
-    ).join('\n'); 
-
-    $goodsList.insertAdjacentHTML('beforeend', goodsList);
+    fetchPromise() {
+        return new Promise((resolve, reject) => {
+            this.fetch(reject, resolve)
+        })
+    }
 }
 
 
-class GetCart {
-    constructor() {}
+class GoodsList {
+    constructor() {
+        this.api = new Api();
+        this.$goodsList = document.querySelector('.goods-list');
+        this.goods = [];
+        const fetch = this.api.fetchPromise();
+
+        fetch.then((data) => { this.onFetchSuccess(data) })
+            .catch((err) => { this.onFetchError(err) });
+
+        console.log(fetch);
+    }
+
+
+    addCartItem(index) {
+        this.cart.addToCart(this.goods[index]);
+    }
+
+    delCartItem(index) {
+        this.cart.delToCart(this.goods[index]);
+    }
+
+    onFetchSuccess(data) {
+        this.goods = data.map(({ title, price }) => new GoodsItem(title, price));
+        this.render();
+    }
+
+    onFetchError(err) {
+        this.$goodsList.insertAdjacentHTML('beforeend', `<h3>${err}</h3>`);
+    }
+
+    render() {
+        this.$goodsList.textContent = '';
+        this.goods.forEach((good) => {
+            this.$goodsList.insertAdjacentHTML('beforeend', good.getHtml());
+        })
+    }
+}
+
+class GoodsItem {
+    constructor(title, price) {
+        this.title = title;
+        this.price = price;
+    }
+
+    getHtml() {
+        return `<div class="goods-item"><h3>${this.title}</h3><p>${this.price} $</p></div>`;
+    }
+}
+
+
+class Cart {
+    constructor() {
+        this.goods = [];
+    }
+    addToCart(item) {
+        this.goods.push(item);
+    }
+
+    delToCart() {
+        this.goods.splice(item, 1);
+    }
 }
 
 
 class GetItem {
-    constructor() {}
-    getSumm(){
+    constructor() {
+    }
+    getSumm(data) {
         let fullSumm = 0;
         goods.forEach(items => {
             fullSumm += items.price;
@@ -37,5 +113,5 @@ class GetItem {
     }
 }
 
-console.log(GetItem.prototype.getSumm());
-renderGoodsList();
+
+const goodsList = new GoodsList();

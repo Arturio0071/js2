@@ -8,13 +8,29 @@
 </head>
 
 <body>
-  <header>
-    <button class="cart-button" type="button">Корзина</button>
-  </header>
-  <main>
-    <div class="goods-list"></div>
-  </main>
+  <div id="app">
+    <header>
+      <input id="search" v-model="searchLine" v-on:input="searchHandler">
+      <button class="cart-button" type="button" v-on:click="openCart">Корзина {{cart.length}}</button>
+      <div class="header-cart" v-if="isVisibleCart">
+        <ul>
+          <li v-for="(good, index) in cart">{{good.title}} <button :data-index="index"
+              v-on:click="deletToCart">x</button></li>
+        </ul>
+      </div>
+    </header>
+    <main>
+      <div class="goods-list">
+        <div class="goods-item" v-for="(good, index) in filtredGoods">
+          <h3>{{ good.title }}</h3>
+          <p>{{ good.price }}</p>
+          <button class="add_cart" type="button" :data-index="index" v-on:click="addToCart">В корзину</button>
+        </div>
+      </div>
+    </main>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <script src="script.js"></script>
 </body>
 

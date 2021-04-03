@@ -1,44 +1,6 @@
-Vue.component('search', {
-    template: '<div><input id="search" v-model="search"><button v-on:click="searchHandler">SEARCH</button></div>',
-    data() {
-        return {
-            search: '',
-        }
-    },
-    methods: {
-        searchHandler() {
-            this.$emit('search', this.search);
-        }
-    }
-})
-
-Vue.component('goods-item', {
-    template: '<div :data-id="id" class="goods-item"><h3>{{ title }}</h3><p>{{ price }}</p></div>',
-    props: ['title', 'price', 'id']
-})
-
-Vue.component('cart', {
-    template: `<div>
-      <button class="cart-button" @click="openCartHandler" type="button">Корзина</button>
-      <div v-if="isVisibleCart" v-on:click="removeHandler">
-        <slot></slot>
-      </div>
-    </div>`,
-    data() {
-        return {
-            isVisibleCart: false
-        }
-    },
-    methods: {
-        openCartHandler() {
-            this.isVisibleCart = !this.isVisibleCart;
-        },
-
-        removeHandler(e) {
-            this.$emit('remove', e)
-        }
-    }
-})
+import cart from './src/cart.js';
+import item from './src/item.js';
+import searc from './src/search.js';
 
 const vue = new Vue({
     el: "#app",
